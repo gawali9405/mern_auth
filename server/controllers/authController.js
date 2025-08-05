@@ -154,7 +154,9 @@ export const sendVerificationOtp = async (req, res) => {
     };
     await transporter.sendMail(mailOptions);
     console.log("Verification OTP sent successfully");
-    return res.status(200).json({ message: "Verification OTP sent successfully" });
+    return res
+      .status(200)
+      .json({ message: "Verification OTP sent successfully" });
   } catch (error) {
     return res.status(500).json({
       message: "Internal server error",
@@ -191,5 +193,75 @@ export const verifyVerificationOtp = async (req, res) => {
   }
 };
 
+// check if user is authenticated or not
+export const isAuthenticated = async (req, res) => {
+  try {
+    return res.status(200).json({ message: "User is authenticated" });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};
 
- 
+// send password reset otp controller
+export const sendPasswordResetOtp = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const otp = Math.floor(100000 + Math.random() * 900000);
+    user.resetOtp = otp;
+    user.resetOtpExpiryAt = Date.now() + 60 * 60 * 1000;
+    await user.save();
+    const mailOptions = {
+      from: process.env.SENDER_EMAIL,
+      to: email,
+      subject: "Reset your password",
+      text: `Your reset OTP is: ${otp}`,
+    };
+    await transporter.sendMail(mailOptions);
+    console.log("Password reset OTP sent successfully");
+    return res
+      .status(200)
+      .json({ message: "Password reset OTP sent successfully" });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};
+
+// verify password reset otp controller
+export const verifyPasswordResetOtp = async (req, res) => {
+  try {
+    const { email, otp, newPassword } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    if (user.resetOtp !== otp) {
+      return res.status(400).json({ message: "Invalid OTP" });
+    }
+    if (user.resetOtpExpiryAt < Date.now()) {
+      return res.status(400).json({ message: "OTP expired" });
+    }
+    user.resetOtp = null;
+    user.resetOtpExpiryAt = null;
+    user.password = await bcrypt.hash(newPassword, 10);
+    await user.save();
+    console.log("Password reset OTP verified successfully");
+    return res
+      .status(200)
+      .json({ message: "Password reset OTP verified successfully" });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};
