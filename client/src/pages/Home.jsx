@@ -4,7 +4,7 @@ import Header from "../components/Header";
 
 const Home = () => {
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gradient-to-br from-purple-100 via-blue-100 to-purple-200">
       <Navbar />
       <Header />
     </div>

@@ -1,12 +1,12 @@
 import React, { useState, useContext } from "react";
 import { FaUser, FaEnvelope, FaLock } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
 import axios from "axios";
 import { toast } from "react-toastify";
 
 const Login = () => {
-  const [mode, setMode] = useState("Sign Up");
+  const [mode, setMode] = useState("login");
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -14,7 +14,8 @@ const Login = () => {
   });
 
   const navigate = useNavigate();
-  const { backend_url, setIsLoading, setError, setUser } = useContext(AppContext);
+  const { backend_url, setIsLoading, setError, setUser, getUserData } =
+    useContext(AppContext);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -26,23 +27,36 @@ const Login = () => {
 
     try {
       const endpoint =
-        mode === "Sign Up"
+        mode === "signup"
           ? `${backend_url}/api/auth/register`
           : `${backend_url}/api/auth/login`;
 
-      const response = await axios.post(endpoint, formData);
+      // Send only required fields
+      const payload =
+        mode === "signup"
+          ? formData
+          : { email: formData.email, password: formData.password };
 
+      const response = await axios.post(endpoint, payload);
+
+      // First update user with the response data
       setUser(response.data.user);
-      toast.success(`${mode} successful`);
+      toast.success(`${mode === "signup" ? "Sign Up" : "Login"} successful`);
 
-      if (mode === "Sign Up") {
-        navigate("/email-verify");
+      // For login, we already have the user data in the response
+      if (mode === "login") {
+        // The user data is already in response.data.user
+        // No need to call getUserData() as we already have the data
+        navigate("/");
       } else {
-        navigate("/dashboard");
+        // For signup, go to email verification
+        navigate("/email-verify");
       }
     } catch (error) {
-      setError(error.response?.data?.message || error.message);
-      toast.error(error.response?.data?.message || error.message);
+      const errorMsg = error.response?.data?.message || "Something went wrong";
+      setError(errorMsg);
+      toast.error(errorMsg);
+      console.error(errorMsg);
     } finally {
       setIsLoading(false);
     }
@@ -52,14 +66,14 @@ const Login = () => {
     <div className="h-screen flex items-center justify-center bg-gradient-to-br from-purple-400 via-blue-300 to-purple-500">
       <div className="bg-[#0F172A] text-white rounded-xl shadow-lg p-8 w-full max-w-sm">
         <h2 className="text-2xl font-bold text-center mb-2">
-          {mode === "Sign Up" ? "Create Account" : "Login"}
+          {mode === "signup" ? "Create Account" : "Login"}
         </h2>
         <p className="text-center text-gray-400 mb-6">
-          {mode === "Sign Up" ? "Create your account" : "Login to your account"}
+          {mode === "signup" ? "Create your account" : "Login to your account"}
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {mode === "Sign Up" && (
+          {mode === "signup" && (
             <div className="flex items-center bg-[#1E293B] rounded-full px-4 py-2">
               <FaUser className="text-gray-400 mr-3" />
               <input
@@ -100,26 +114,31 @@ const Login = () => {
             />
           </div>
 
-          <div className="text-right">
-            <a href="/reset-password" className="text-blue-400 text-sm hover:underline">
-              Forgot password?
-            </a>
-          </div>
+          {mode === "login" && (
+            <div className="text-right">
+              <Link
+                to="/reset-password"
+                className="text-blue-400 text-sm hover:underline"
+              >
+                Forgot password?
+              </Link>
+            </div>
+          )}
 
           <button
             type="submit"
             className="w-full bg-gradient-to-r from-purple-500 to-blue-500 text-white font-semibold py-2 rounded-full hover:opacity-90 transition"
           >
-            {mode === "Sign Up" ? "Sign Up" : "Login"}
+            {mode === "signup" ? "Sign Up" : "Login"}
           </button>
 
           <p className="text-center text-sm text-gray-400">
-            {mode === "Sign Up" ? (
+            {mode === "signup" ? (
               <>
                 Already have an account?{" "}
                 <button
                   type="button"
-                  onClick={() => setMode("Login")}
+                  onClick={() => setMode("login")}
                   className="text-blue-400 hover:underline"
                 >
                   Login
@@ -130,7 +149,7 @@ const Login = () => {
                 New user?{" "}
                 <button
                   type="button"
-                  onClick={() => setMode("Sign Up")}
+                  onClick={() => setMode("signup")}
                   className="text-blue-400 hover:underline"
                 >
                   Sign Up
