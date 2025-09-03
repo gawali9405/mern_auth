@@ -288,7 +288,7 @@ export const verifyOtpController = async (req, res) => {
 export const resetPasswordController = async (req, res) => {
   try {
     const { newPassword } = req.body;
-    const userId = req.userId;
+    const user = req.user; // get user from authMiddleware
 
     // 1. Validate input
     if (!newPassword) {
@@ -298,16 +298,7 @@ export const resetPasswordController = async (req, res) => {
       });
     }
 
-    // 2. Find user by ID from token
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({
-        message: "User not found",
-        success: false,
-      });
-    }
-
-    // 3. Hash and update password
+    // 2. Hash and update password
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     user.password = hashedPassword;
     await user.save();
