@@ -3,14 +3,16 @@ import User from "../models/userModel.js";
 
 export const authMiddleware = async (req, res, next) => {
   try {
-    // 1. Read token from cookie
-    const token = req.cookies.token;
-    if (!token) {
+    // 1. Read token from header
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(401).json({
         message: "Not authenticated",
         success: false,
       });
     }
+
+    const token = authHeader.split(" ")[1]; // ✅ extract actual token
 
     // 2. Verify JWT
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -33,10 +35,11 @@ export const authMiddleware = async (req, res, next) => {
     }
 
     // 5. Attach user to request
-    req.user = user; // ✅ attach full user
+    req.user = user;
 
-    next(); // go to next middleware or route
+    next();
   } catch (error) {
+    console.error("Auth middleware error:", error);
     return res.status(401).json({
       message: "Invalid or expired token",
       success: false,
