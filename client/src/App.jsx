@@ -6,7 +6,7 @@ import Login from "./Pages/Login";
 import Navbar from "./Pages/Navbar";
 import ForgotPassword from "./Pages/ForgotPassword";
 import VerifyOtp from "./Pages/VerifyOtp";
-import ResetPassword from "./Pages/ResetPassword";
+import ResetPassword from "./Pages/ResetPassword"; 
 
 const App = () => {
   return (
@@ -18,7 +18,7 @@ const App = () => {
       <Route path="/sign-up" element={<Register />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/verify-otp" element={<VerifyOtp />} />
-      <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} /> 
     </Routes>
     </>
   );

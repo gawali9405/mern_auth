@@ -87,13 +87,6 @@ const Navbar = () => {
                       </p>
                     </div>
                     <button
-                      onClick={() => navigate("/profile")}
-                      className="flex w-full items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50"
-                    >
-                      <FaUserCog className="mr-3 text-gray-500" />
-                      Profile Settings
-                    </button>
-                    <button
                       onClick={handleLogout}
                       disabled={isLoggingOut}
                       className="flex w-full items-center px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 disabled:opacity-70 disabled:cursor-not-allowed"
