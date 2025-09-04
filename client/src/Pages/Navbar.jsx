@@ -1,16 +1,38 @@
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../Context/AuthContext"; 
-import { FaUserCircle } from "react-icons/fa";
+import { FaUserCircle, FaSignOutAlt, FaUserCog, FaChevronDown, FaChevronUp } from "react-icons/fa";
+import { motion, AnimatePresence } from "framer-motion";
 
 const Navbar = () => {
   const navigate = useNavigate();
-  const { user, isLoggedIn, logout } = useAuth(); // <-- read user and logout from context
+  const { user, isLoggedIn, logout } = useAuth();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const dropdownRef = useRef(null);
 
-  const handleLogout = () => {
-    logout();                  // <-- clears localStorage + resets user in context
-    console.log("User logged out");
-    navigate("/sign-in");      // <-- redirect to sign-in page
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      setIsLoggingOut(true);
+      await logout();
+      navigate("/");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    } finally {
+      setIsLoggingOut(false);
+    }
   };
 
   return (
@@ -26,26 +48,64 @@ const Navbar = () => {
       </div>
 
       {/* Right: User Profile / Logout (only if logged in) */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 relative">
         {isLoggedIn && (
-          <>
-            {/* Profile Avatar & Name */}
-            {user && (
-              <div className="flex items-center gap-2">
-                <FaUserCircle className="w-10 h-10 rounded-full border border-white/20 shadow" />
-                <span className="hidden sm:inline text-white font-medium">
-                  {user.name || "User"}
-                </span>
-              </div>
-            )}
-            {/* Logout Button */}
+          <div className="relative" ref={dropdownRef}>
             <button
-              onClick={handleLogout}
-              className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-transform transform hover:scale-105 active:scale-95 shadow cursor-pointer"
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              className="flex items-center gap-2 bg-white/5 hover:bg-white/10 rounded-full px-3 py-1.5 transition-colors"
+              aria-label="User menu"
+              aria-expanded={isDropdownOpen}
             >
-              Logout
+              <FaUserCircle className="w-8 h-8 sm:w-10 sm:h-10 text-white/90" />
+              <span className="hidden sm:inline text-white font-medium truncate max-w-[120px] lg:max-w-[200px]">
+                {user?.name || "User"}
+              </span>
+              {isDropdownOpen ? (
+                <FaChevronUp className="text-white/70 ml-1" />
+              ) : (
+                <FaChevronDown className="text-white/70 ml-1" />
+              )}
             </button>
-          </>
+
+            <AnimatePresence>
+              {isDropdownOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2 }}
+                  className="absolute right-0 mt-2 w-56 rounded-lg bg-white shadow-lg ring-1 ring-black/5 focus:outline-none z-30"
+                >
+                  <div className="py-1">
+                    <div className="px-4 py-3 border-b border-gray-100">
+                      <p className="text-sm text-gray-900 font-medium truncate">
+                        {user?.name || 'User'}
+                      </p>
+                      <p className="text-xs text-gray-500 truncate">
+                        {user?.email || ''}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => navigate("/profile")}
+                      className="flex w-full items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50"
+                    >
+                      <FaUserCog className="mr-3 text-gray-500" />
+                      Profile Settings
+                    </button>
+                    <button
+                      onClick={handleLogout}
+                      disabled={isLoggingOut}
+                      className="flex w-full items-center px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 disabled:opacity-70 disabled:cursor-not-allowed"
+                    >
+                      <FaSignOutAlt className="mr-3" />
+                      {isLoggingOut ? 'Signing out...' : 'Sign out'}
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         )}
       </div>
     </nav>
