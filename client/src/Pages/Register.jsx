@@ -36,7 +36,7 @@ const Register = () => {
       // Only send required fields to backend
       const { name, email, password } = formData;
       const response = await axios.post(
-        "http://localhost:8000/api/user/sign-up",
+        `${process.env.BACKEND_URL}/api/user/sign-up`,
         { name, email, password }
       );
       toast.success(`${response.data.message}`);

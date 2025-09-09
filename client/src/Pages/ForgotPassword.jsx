@@ -18,7 +18,7 @@ const ForgotPassword = () => {
 
     try {
       setLoading(true);
-      const res = await axios.post("http://localhost:8000/api/user/forgot-password", { email });
+      const res = await axios.post(`${process.env.BACKEND_URL}/api/user/forgot-password`, { email });
       toast.success(res.data?.message || "If an account exists, an OTP has been sent.");
       setEmail("");
       navigate("/verify-otp", { state: { email } });

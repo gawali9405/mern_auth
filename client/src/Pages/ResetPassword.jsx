@@ -34,7 +34,7 @@ const ResetPassword = () => {
     try {
       setLoading(true);
       const res = await axios.post(
-        "http://localhost:8000/api/user/reset-password",
+        `${process.env.BACKEND_URL}/api/user/reset-password`,
         { newPassword: password },
         {
           headers: {

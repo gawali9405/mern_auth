@@ -6,7 +6,7 @@ import connectDB from "./config/db.js";
 import userRouter from "./routes/userRoute.js";
 
 const app = express();  
-
+connectDB();
 
 app.use(cors({
     origin: process.env.FRONTEND_URL,
@@ -24,7 +24,7 @@ app.use("/api/user", userRouter)
 
 
 const PORT = process.env.PORT || 8000;
-connectDB();
+
 
 app.listen(PORT, () => {
   console.log(`Server is running on port http://localhost:${PORT}`);
