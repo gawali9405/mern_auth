@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { API_URL } from "../config.js"
 
 const Register = () => {
   const navigate = useNavigate();
@@ -18,38 +19,43 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const { name, email, password, confirmPassword } = formData;
+
+    // Frontend validation
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
+    if (password.length < 6) {
+      toast.error("Password must be at least 6 characters long");
+      return;
+    }
+    if (email.length < 6) {
+      toast.error("Email must be at least 6 characters long");
+      return;
+    }
+
     try {
-      // Frontend validation
-      if (formData.password !== formData.confirmPassword) {
-        toast.error("Passwords do not match");
-        return;
-      }
-      if (formData.password.length < 6) {
-        toast.error("Password must be at least 6 characters long");
-        return;
-      }
-      if (formData.email.length < 6) {
-        toast.error("Email must be at least 6 characters long");
-        return;
-      }
+      // Send only required fields to backend
+      const response = await axios.post(`${API_URL}/api/user/sign-up`, {
+        name,
+        email,
+        password,
+      });
 
-      // Only send required fields to backend
-      const { name, email, password } = formData;
-      const response = await axios.post(
-        `${process.env.BACKEND_URL}/api/user/sign-up`,
-        { name, email, password }
-      );
-      toast.success(`${response.data.message}`);
+      toast.success(response.data?.message || "Registered successfully!");
       console.log(response.data);
-      navigate("/");
 
-      // Clear form
+      // Reset form
       setFormData({
         name: "",
         email: "",
         password: "",
         confirmPassword: "",
       });
+
+      navigate("/"); // Redirect to home or login page
     } catch (error) {
       console.error(error);
       toast.error(
@@ -90,9 +96,7 @@ const Register = () => {
           </div>
 
           <div>
-            <label className="block text-white font-medium mb-1">
-              Password
-            </label>
+            <label className="block text-white font-medium mb-1">Password</label>
             <input
               type="password"
               name="password"

@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate, useLocation } from "react-router-dom";
+import { API_URL } from "../config.js"
 
 const VerifyOtp = () => {
   const [otp, setOtp] = useState(Array(6).fill(""));
@@ -51,7 +52,7 @@ const VerifyOtp = () => {
     try {
       setLoading(true);
       const res = await axios.post(
-        `${process.env.BACKEND_URL}/api/user/verify-otp`,
+        `${API_URL}/api/user/verify-otp`,
         {
           email,
           otp: otpString,

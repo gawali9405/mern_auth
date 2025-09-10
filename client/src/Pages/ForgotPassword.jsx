@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { API_URL } from "../config.js"
 
 const ForgotPassword = () => {
   const navigate = useNavigate();
@@ -18,7 +19,7 @@ const ForgotPassword = () => {
 
     try {
       setLoading(true);
-      const res = await axios.post(`${process.env.BACKEND_URL}/api/user/forgot-password`, { email });
+      const res = await axios.post(`${API_URL}/api/user/forgot-password`, { email });
       toast.success(res.data?.message || "If an account exists, an OTP has been sent.");
       setEmail("");
       navigate("/verify-otp", { state: { email } });

@@ -6,7 +6,7 @@ import Login from "./Pages/Login";
 import Navbar from "./Pages/Navbar";
 import ForgotPassword from "./Pages/ForgotPassword";
 import VerifyOtp from "./Pages/VerifyOtp";
-import ResetPassword from "./Pages/ResetPassword"; 
+import ResetPassword from "./Pages/ResetPassword";  
 
 const App = () => {
   return (

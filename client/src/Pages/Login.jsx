@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { useAuth } from "../Context/AuthContext"; 
+import { API_URL } from "../config.js"
 
 const Login = () => {
   const navigate = useNavigate();
@@ -20,7 +21,7 @@ const Login = () => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        `${process.env.BACKEND_URL}/api/user/sign-in`,
+        `${API_URL}/api/user/sign-in`,
         formData
       );
 
