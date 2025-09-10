@@ -1,8 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../Context/AuthContext";   
-
-import { API_URL } from "../config.js"
+ 
 
 const Home = () => { 
   const { isLoggedIn } = useAuth();

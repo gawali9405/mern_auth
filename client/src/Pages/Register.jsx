@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { API_URL } from "../config.js"
+import { API_URL } from "../config.js";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -38,11 +38,15 @@ const Register = () => {
 
     try {
       // Send only required fields to backend
-      const response = await axios.post(`${API_URL}/api/user/sign-up`, {
-        name,
-        email,
-        password,
-      });
+      const response = await axios.post(
+        `${API_URL}/api/user/sign-up`,
+        {
+          name,
+          email,
+          password,
+        },
+        { withCredentials: true }
+      );
 
       toast.success(response.data?.message || "Registered successfully!");
       console.log(response.data);
@@ -96,7 +100,9 @@ const Register = () => {
           </div>
 
           <div>
-            <label className="block text-white font-medium mb-1">Password</label>
+            <label className="block text-white font-medium mb-1">
+              Password
+            </label>
             <input
               type="password"
               name="password"

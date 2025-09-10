@@ -22,7 +22,8 @@ const Login = () => {
     try {
       const response = await axios.post(
         `${API_URL}/api/user/sign-in`,
-        formData
+        formData,
+        { withCredentials: true }
       );
 
       // ✅ Update context + localStorage instantly

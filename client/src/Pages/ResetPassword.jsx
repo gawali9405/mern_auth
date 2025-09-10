@@ -41,6 +41,7 @@ const ResetPassword = () => {
           headers: {
             Authorization: `Bearer ${verificationToken}`,
           },
+          withCredentials: true,
         }
       );
 

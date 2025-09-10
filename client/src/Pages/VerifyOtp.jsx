@@ -56,7 +56,8 @@ const VerifyOtp = () => {
         {
           email,
           otp: otpString,
-        }
+        },
+        { withCredentials: true }
       );
       console.log(res.data.verificationToken);
       if (res.data?.success) {

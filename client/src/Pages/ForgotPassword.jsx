@@ -19,7 +19,7 @@ const ForgotPassword = () => {
 
     try {
       setLoading(true);
-      const res = await axios.post(`${API_URL}/api/user/forgot-password`, { email });
+      const res = await axios.post(`${API_URL}/api/user/forgot-password`, { email }, { withCredentials: true });
       toast.success(res.data?.message || "If an account exists, an OTP has been sent.");
       setEmail("");
       navigate("/verify-otp", { state: { email } });
