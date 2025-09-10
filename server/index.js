@@ -6,21 +6,24 @@ import userRouter from "../routes/userRoute.js";
 
 const app = express();
 
-// connect db
+// Connect to MongoDB
 connectDB();
 
-// middleware
-app.use(cors({
-  origin: "https://mern-auth-mt5o553px-gawali.vercel.app",
-  credentials: true,
-}));
+// Middleware
+app.use(
+  cors({
+    origin: "https://mern-auth-mt5o553px-gawali.vercel.app", // frontend URL
+    credentials: true, // allow cookies
+  })
+);
 app.use(cookieParser());
 app.use(express.json());
 
-// routes
+// Routes
 app.get("/", (req, res) => {
   res.send("API is running");
 });
 app.use("/api/user", userRouter);
 
-export default app; // <- THIS is what Vercel will use as serverless handler
+// For Vercel serverless function export
+export default app;
